@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DRG Save Converter</title>
+  </head>
+  <body>
+    <h1>DRG Save Converter</h1>
+    <p>This is a small tool that will take a sandboxed save for Deep Rock Galactic and convert it into a regular save.</p>
+    <input type="file" id="file">
+    <script type="text/javascript">
+function indexOf(haystack, needle) {
+  console.log(haystack, needle);
+  next:
+  for (let i = 0; i < haystack.length - needle.length; i++) {
+    for (let j = 0; j < needle.length; j++) {
+      if (needle[j] != haystack[i + j]) {
+        continue next;
+      }
+    }
+    return i;
+  }
+  return -1;
+}
+
+// https://stackoverflow.com/questions/32232134/does-splice-exist-for-typedarrays-or-is-there-an-equivalent
+function splice(arr, starting, deleteCount, elements) {
+  if (arguments.length === 1) {
+    return arr;
+  }
+  starting = Math.max(starting, 0);
+  deleteCount = Math.max(deleteCount, 0);
+  elements = elements || [];
+
+  const newSize = arr.length - deleteCount + elements.length;
+  const splicedArray = new arr.constructor(newSize);
+
+  splicedArray.set(arr.subarray(0, starting));
+  splicedArray.set(elements, starting);
+  splicedArray.set(arr.subarray(starting + deleteCount), starting + elements.length);
+  return splicedArray;
+};
+function save(buffer, name) {
+  const url = window.URL.createObjectURL(new Blob([buffer]));
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
+document.getElementById('file').addEventListener('change', e => {
+  const f = e.target.files[0];
+  f.arrayBuffer().then(b => {
+    const array = new Uint8Array(b);
+    const remove = '00 09 00 00 00 49 73 4D 6F 64 64 65 64 00 0D 00 00 00 42 6F 6F 6C 50 72 6F 70 65 72 74 79 00 00 00 00 00 00 00 00 00 01 00'.split(' ').map(h => parseInt(h, 16));
+    const index = indexOf(array, remove);
+    const result = splice(array, index, remove.length);
+    save(result.buffer, f.name)
+  });
+});
+    </script>
+  </body>
+</html>
