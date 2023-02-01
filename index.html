@@ -56,7 +56,7 @@ document.getElementById('file').addEventListener('change', e => {
   const f = e.target.files[0];
   f.arrayBuffer().then(b => {
     const array = new Uint8Array(b);
-    const remove = '00 09 00 00 00 49 73 4D 6F 64 64 65 64 00 0D 00 00 00 42 6F 6F 6C 50 72 6F 70 65 72 74 79 00 00 00 00 00 00 00 00 00 01 00'.split(' ').map(h => parseInt(h, 16));
+    const remove = '09 00 00 00 49 73 4D 6F 64 64 65 64 00 0D 00 00 00 42 6F 6F 6C 50 72 6F 70 65 72 74 79 00 00 00 00 00 00 00 00 00 01 00'.split(' ').map(h => parseInt(h, 16));
     const index = indexOf(array, remove);
     if (index === -1) {
       alert('Uploaded file is not a sandboxed save');
